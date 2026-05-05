@@ -19,7 +19,7 @@ pio.renderers.default = 'browser'
 pio.templates.default = 'presentation'
 # from scipy import stats
 
-URL = st.secrets('URL')
+URL = st.secrets["URL"]
 
 DAILY_TARGET = 30 # minutes
 
