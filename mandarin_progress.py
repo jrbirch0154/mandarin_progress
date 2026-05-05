@@ -231,12 +231,12 @@ if __name__ == "__main__":
             col1, col2 = st.columns(2)
             with col1:
                 st.metric("Total Hours", value=f"{df['Total (H)'].max():.1f}")
-                st.metric('Best day:',value=best_day,delta=best_day_minutes)
+                st.metric('Best day:',value=best_day,delta=f'{best_day_minutes}m')
                 
                 
             with col2:
                 st.metric("Start date:", value=start_date, delta=f"{days_since_started} days")
-                st.metric('Overall avg:', value=f"{overall_avg:.1f}", delta=round(overall_avg - DAILY_TARGET, 1))
+                st.metric('Overall avg:', value=f"{overall_avg:.1f}m", delta=round(overall_avg - DAILY_TARGET, 1))
                 
                 
             for i in [line, bar, violin, const]:
