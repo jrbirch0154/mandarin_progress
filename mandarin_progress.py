@@ -231,10 +231,10 @@ if __name__ == "__main__":
             col1, col2 = st.columns(2)
             with col1:
                 st.metric(f"Total Hours: {df['Total (H)'].max():.1f}")
-                st.metric('Best day:',best_day,delta=best_day_minutes)
+                st.metric('Best day:',value=best_day,delta=best_day_minutes)
             with col2:
-                st.metric("Start date:", start_date, delta=days_since_started)
-                st.metric('Overall avg:',overall_avg,delta=overall_avg-DAILY_TARGET)
+                st.metric("Start date:",value=start_date, delta=days_since_started)
+                st.metric('Overall avg:',value=overall_avg,delta=overall_avg-DAILY_TARGET)
 
             for i in [line, bar, violin, const]:
                 st.plotly_chart(i)
