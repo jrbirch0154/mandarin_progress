@@ -232,52 +232,51 @@ if __name__ == "__main__":
 
     st.title("Mandarin Progress Tracker")
 
-    if st.button("Run"):
-        try:
-            df = init()
-            csv = df.to_csv(index=False)
-            st.success("Data found")
+    try:
+        df = init()
+        csv = df.to_csv(index=False)
+        st.success("Data found")
 
-            start_date = df["Date"].min().strftime("%Y-%m-%d")
-            days_since_started = (df["Date"].max() - df["Date"].min()).days
-            best_row = df.loc[df["Input (Min)"].idxmax()]
-            best_day = best_row["Date"].strftime("%Y-%m-%d")
-            best_day_minutes = best_row["Input (Min)"]
-            overall_avg = df["Input (Min)"].mean()
+        start_date = df["Date"].min().strftime("%Y-%m-%d")
+        days_since_started = (df["Date"].max() - df["Date"].min()).days
+        best_row = df.loc[df["Input (Min)"].idxmax()]
+        best_day = best_row["Date"].strftime("%Y-%m-%d")
+        best_day_minutes = best_row["Input (Min)"]
+        overall_avg = df["Input (Min)"].mean()
 
-            line = line_plot(df)
-            bar = bar_plot(df)
-            bar_m = bar_plot_month(df)
-            violin = violin_plot(df)
-            const = consist_plot(df)
+        line = line_plot(df)
+        bar = bar_plot(df)
+        bar_m = bar_plot_month(df)
+        violin = violin_plot(df)
+        const = consist_plot(df)
 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Total Hours", value=f"{df['Total (H)'].max():.1f}")
-                st.metric(
-                    "Best day:", value=best_day, delta=f"{best_day_minutes}m"
-                )
-
-            with col2:
-                st.metric(
-                    "Start date:",
-                    value=start_date,
-                    delta=f"{days_since_started} days",
-                )
-                st.metric(
-                    "Overall avg:",
-                    value=f"{overall_avg:.1f}m",
-                    delta=f"{round(overall_avg - DAILY_TARGET, 1)}m",
-                )
-
-            for i in [line, bar, bar_m, violin]: #, const]:
-                st.plotly_chart(i)
-
-            st.download_button(
-                label="Download data as CSV",
-                data=csv,
-                file_name="mandarin_data.csv",
-                mime="text/csv",
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Hours", value=f"{df['Total (H)'].max():.1f}")
+            st.metric(
+                "Best day:", value=best_day, delta=f"{best_day_minutes}m"
             )
-        except Exception as e:
-            st.error(f"Error: {e}")
+
+        with col2:
+            st.metric(
+                "Start date:",
+                value=start_date,
+                delta=f"{days_since_started} days",
+            )
+            st.metric(
+                "Overall avg:",
+                value=f"{overall_avg:.1f}m",
+                delta=f"{round(overall_avg - DAILY_TARGET, 1)}m",
+            )
+
+        for i in [line, bar, bar_m, violin]: #, const]:
+            st.plotly_chart(i)
+
+        st.download_button(
+            label="Download data as CSV",
+            data=csv,
+            file_name="mandarin_data.csv",
+            mime="text/csv",
+        )
+    except Exception as e:
+        st.error(f"Error: {e}")
