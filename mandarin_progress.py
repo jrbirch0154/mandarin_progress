@@ -236,7 +236,7 @@ if __name__ == "__main__":
                 
             with col2:
                 st.metric("Start date:", value=start_date, delta=f"{days_since_started} days")
-                st.metric('Overall avg:', value=f"{overall_avg:.1f}m", delta=round(overall_avg - DAILY_TARGET, 1))
+                st.metric('Overall avg:', value=f"{overall_avg:.1f}m", delta=f'{round(overall_avg - DAILY_TARGET, 1)}m')
                 
                 
             for i in [line, bar, violin, const]:
