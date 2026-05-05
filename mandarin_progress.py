@@ -35,7 +35,7 @@ MILESTONES = {
 }
 
 
-@st.cache_data(ttl=(60 * 5))  # cache data for 5 min
+@st.cache_data(ttl=(60 * 5), show_time=True)  # cache data for 5 min
 def init(URL=URL) -> pd.DataFrame:
     df = pd.read_csv(URL, low_memory=False)
     # df = df.drop('Notes',axis=1) # already deleted
@@ -74,7 +74,8 @@ def line_plot(df):
     )
 
     fig.update_traces(
-        fill="tozeroy", fillcolor="rgba(0,0,0,.1)", line_width=2.5
+        fill="tozeroy", fillcolor="rgba(0,0,0,.1)", line_width=2.5,
+        hovertemplate="Date: %{x}<br>Hours: %{y:.2f}"
     )
 
     fig.update_layout(xaxis_title="Date", yaxis_title="Hours")
@@ -93,7 +94,7 @@ def line_plot(df):
     return fig
 
 
-# %% Bar plot
+# %% Bar plots
 
 
 def bar_plot(df):
@@ -130,6 +131,27 @@ def bar_plot(df):
     fig2.update_xaxes(range=["2026-01-01", df["Date"].max()])
 
     return fig2
+
+
+def bar_plot_month(df):
+    df["Month"] = df["Date"].dt.to_period("M")
+    df_m = df.copy()
+    df_m = df_m.groupby("Month")["Input (Min)"].sum().reset_index()
+    df_m["Month"] = df_m["Month"].astype(str)
+    df_m["Hours"] = (df_m["Input (Min)"] / 60).round(2)
+    fig = px.bar(
+        df_m,
+        x="Month",
+        y="Hours",
+        color="Hours",
+        color_continuous_scale="RdYlBu",
+    )
+    fig.update_layout(
+        title="Hours per month", xaxis_title="Date", yaxis_title="Hours"
+    )
+    
+    fig.update_traces(hovertemplate="Month: %{x}<br>Hours: %{y:.1f}")
+    return fig
 
 
 # %% Violin plot
@@ -221,25 +243,34 @@ if __name__ == "__main__":
             best_row = df.loc[df["Input (Min)"].idxmax()]
             best_day = best_row["Date"].strftime("%Y-%m-%d")
             best_day_minutes = best_row["Input (Min)"]
-            overall_avg = df['Input (Min)'].mean()
+            overall_avg = df["Input (Min)"].mean()
 
             line = line_plot(df)
             bar = bar_plot(df)
+            bar_m = bar_plot_month(df)
             violin = violin_plot(df)
             const = consist_plot(df)
 
             col1, col2 = st.columns(2)
             with col1:
                 st.metric("Total Hours", value=f"{df['Total (H)'].max():.1f}")
-                st.metric('Best day:',value=best_day,delta=f'{best_day_minutes}m')
-                
-                
+                st.metric(
+                    "Best day:", value=best_day, delta=f"{best_day_minutes}m"
+                )
+
             with col2:
-                st.metric("Start date:", value=start_date, delta=f"{days_since_started} days")
-                st.metric('Overall avg:', value=f"{overall_avg:.1f}m", delta=f'{round(overall_avg - DAILY_TARGET, 1)}m')
-                
-                
-            for i in [line, bar, violin, const]:
+                st.metric(
+                    "Start date:",
+                    value=start_date,
+                    delta=f"{days_since_started} days",
+                )
+                st.metric(
+                    "Overall avg:",
+                    value=f"{overall_avg:.1f}m",
+                    delta=f"{round(overall_avg - DAILY_TARGET, 1)}m",
+                )
+
+            for i in [line, bar, bar_m, violin]: #, const]:
                 st.plotly_chart(i)
 
             st.download_button(
